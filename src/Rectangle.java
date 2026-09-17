@@ -9,7 +9,7 @@ import java.awt.*;
 
 
  
-public class Rectangle extends Figure{
+public class Rectangle extends Symbol{
 
     public static int EDGES = 4;
     

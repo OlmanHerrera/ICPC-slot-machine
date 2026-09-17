@@ -9,7 +9,7 @@ import java.awt.geom.*;
  * @version 1.0.  (15 July 2000) 
  */
 
-public class Circle extends Figure{
+public class Circle extends Symbol{
 
     public static final double PI=3.1416;
     

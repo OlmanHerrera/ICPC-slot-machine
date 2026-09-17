@@ -12,7 +12,7 @@ import java.util.List;
 public class Wheel extends Rectangle
 {
     private int MAX_SIZE = 3;
-    private List<Figure> symbols = Arrays.asList(new Figure[MAX_SIZE]);
+    private List<Symbol> symbols = Arrays.asList(new Symbol[MAX_SIZE]);
     private boolean placed;
     private boolean ok; 
     public Wheel()
@@ -49,7 +49,7 @@ public class Wheel extends Rectangle
         ok = state;
     }
     
-    public Figure symbolShape(String color){
+    public Symbol symbolShape(String color){
         if (color == "red"){
             Rectangle shape = new Rectangle();
             return shape;

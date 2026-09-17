@@ -1,17 +1,17 @@
 
 /**
- * Write a description of class Symbol here.
+ * Write a description of class Figure here.
  * 
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class Symbol extends Figure
+public class Symbol
 {
     // instance variables - replace the example below with your own
     private int x;
 
     /**
-     * Constructor for objects of class Symbol
+     * Constructor for objects of class Figure
      */
     public Symbol()
     {
