@@ -33,6 +33,7 @@ public class Wheel extends Rectangle
         
         if (!placed || symbolShape(color)  == null){
             setOk(false);
+            System.out.println("pendejo");
             return;
         }
         currentPos = pos-1;
@@ -49,13 +50,13 @@ public class Wheel extends Rectangle
                 s.updateSize();
                 s.moveHorizontal(position[0]-20);
                 s.moveVertical(30);
-                s.makeVisible();
+
                 setOk(true);
                 return;
             }
             s.moveHorizontal(position[0]);
             s.moveVertical(30);
-            s.makeVisible();
+ 
             symbols.set(pos-1, s);
             setOk(true);
         }
@@ -64,7 +65,7 @@ public class Wheel extends Rectangle
     
     public Symbol spin(){
 
-        int numPos = random.nextInt(11);
+        int numPos = random.nextInt(10,21);
         int pos = 0; 
         for (int i = 0; i <= numPos; i++){
             pos++;
@@ -80,10 +81,10 @@ public class Wheel extends Rectangle
                 }catch (InterruptedException e){
                     Thread.currentThread().interrupt();
                 }
-                
+
             }
             symbols.get(currentPos).makeInvisible();
-      
+                           
         }
         symbols.get(currentPos).makeVisible();
         return symbols.get(currentPos);
@@ -152,7 +153,7 @@ public class Wheel extends Rectangle
         }
     
     }
-
+    
     public void setPlaced(boolean moved){
         placed = moved; 
     }

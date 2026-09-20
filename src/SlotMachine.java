@@ -17,12 +17,15 @@ public class SlotMachine {
     private Rectangle shape = new Rectangle();
     private int shapeWidth = 20;
     private int shapeHeigth = 160;
-    private boolean ok;
+    private boolean ok = true;
     private int currentIndex = 0;
     private Rectangle base = new Rectangle();
     private int baseWidth = 60;
     private int baseHeigth = 10;
     private HashMap<Integer,String> configuration = new HashMap<>();
+    private Rectangle line1 = new Rectangle();
+    private Rectangle line2 = new Rectangle();
+    private Circle buttom = new Circle();
 
     
     public SlotMachine(){
@@ -38,15 +41,39 @@ public class SlotMachine {
         base.moveVertical(120);
         base.changeSize(10,60);
         base.changeColor("blue");
+        updateSpinner();
     }
     
+    public void updateSpinner(){
+        line1.changeSize(40,2);
+        line1.changeColor("black");
+        line2.changeSize(2,40);
+        line2.changeColor("black");
+        buttom.changeSize(20);
+        buttom.changeColor("red");
+        line1.moveVertical(-40);
+        line1.moveHorizontal(58);
+        line2.moveHorizontal(20);
+        buttom.moveHorizontal(70);
+        buttom.moveVertical(-50);
+
+
+    }
     public void addSymbol(int pos, String color){
+        if (wheels.get(0) == null){
+            setOk(false);
+            return;
+        }
+        configuration.put(pos,color);
         for (int i = 0; i <currentIndex; i++){
             Wheel w = wheels.get(i);
             w.addSymbol(pos, color);
             sequence.set(i, w.getShapeCurrentPos());
-            configuration.put(pos, color);
+
         }
+        makeVisible();
+
+
     }
     
     public void delSymbol(int pos){
@@ -54,6 +81,7 @@ public class SlotMachine {
             Wheel w = wheels.get(i);
             w.delSymbol(pos);
             configuration.remove(pos);
+            sequence.set(pos-1,null);
         }
     }
     
@@ -78,10 +106,6 @@ public class SlotMachine {
             currentIndex++;
             wheels.set(pos-1, new Wheel());
             Wheel w = wheels.get(pos-1);
-            for (Integer valor: configuration.keySet()){
-                w.addSymbol(valor,configuration.get(valor));
-            }
-            sequence.set(pos-1, w.getShapeCurrentPos());
             reshape();
             setOk(true);
             return; 
@@ -95,6 +119,8 @@ public class SlotMachine {
             setOk(false);
             return;
         }
+
+        moveSpinner(-60);
         Wheel temp;
         wheels.get(pos-1).makeInvisible();
         wheels.get(pos-1).clear();
@@ -110,7 +136,6 @@ public class SlotMachine {
             }
         }
         currentIndex--;
-        
         if (currentIndex > 0){
             shape.changeSize(shapeHeigth,shapeWidth+60*(currentIndex));
             base.changeSize(baseHeigth,60 + 60*(currentIndex-1));
@@ -121,10 +146,16 @@ public class SlotMachine {
 
 
     }
+    public void moveSpinner(int distance){
+        buttom.moveHorizontal(distance);
+        line1.moveHorizontal(distance);
+        line2.moveHorizontal(distance);
+    }
     private void reshape(){
         int length = wheels.size();
         int currentWidth = 40 * currentIndex;
         shape.changeSize(shapeHeigth, shapeWidth + 60*currentIndex);
+        moveSpinner(60);
         base.changeSize(10, 60 + 60*(currentIndex-1));
         for (int i = 0; i <currentIndex; i++){
             Wheel w = wheels.get(i);
@@ -153,7 +184,6 @@ public class SlotMachine {
             Symbol obtained = w.spin();
             sequence.set(i,obtained);
         }
-
     }
     
     public void spin(int pos){
@@ -186,6 +216,9 @@ public class SlotMachine {
     public void makeInvisible(){
         shape.makeInvisible();
         base.makeInvisible();
+        line1.makeInvisible();
+        line2.makeInvisible();
+        buttom.makeInvisible();
         for (int i = 0; i < currentIndex; i++){
             Wheel w = wheels.get(i);
             w.makeInvisible();
@@ -204,6 +237,9 @@ public class SlotMachine {
         }
         shape.makeVisible();
         base.makeVisible();
+        line1.makeVisible();
+        line2.makeVisible();
+        buttom.makeVisible();
         for (int i = 0; i < currentIndex; i++){
             Wheel w = wheels.get(i);
             w.makeVisible();
@@ -217,7 +253,9 @@ public class SlotMachine {
         setOk(true);
     }
     public boolean isJackpot(){
-        
+        if (wheels.get(0) == null){
+            return false;
+        }
         for (int i = 0 ; i < currentIndex; i++){
 
             if (sequence.get(i).getColor() != sequence.get(0).getColor()){
