@@ -33,7 +33,7 @@ public class SlotMachine {
     }
     
     
-    public void updateShape(){
+    private void updateShape(){
         shape.changeSize(200,20);
         shape.moveVertical(-40);
         shape.changeColor("blue");
@@ -44,7 +44,7 @@ public class SlotMachine {
         updateSpinner();
     }
     
-    public void updateSpinner(){
+    private void updateSpinner(){
         line1.changeSize(40,2);
         line1.changeColor("black");
         line2.changeSize(2,40);
@@ -81,13 +81,12 @@ public class SlotMachine {
             Wheel w = wheels.get(i);
             w.delSymbol(pos);
             configuration.remove(pos);
-            sequence.set(pos-1,null);
+            sequence.set(i, w.getShapeCurrentPos());
         }
+        makeVisible();
     }
     
-    public boolean getOk(){
-        return ok;
-    }
+
     public void addWheel(int pos){
         if (pos < 1 || wheels.get(pos-1) != null){
             setOk(false);
@@ -111,11 +110,70 @@ public class SlotMachine {
             return; 
         }
         setOk(false);
-    
+    }
+    public void placeSymbol(int wheel, String color){
+        if (wheel >= currentIndex){
+            setOk(false);
+            return;
+        }
+        if (wheels.get(wheel-1) == null || wheels.get(0) == null){
+            setOk(false);
+            return;
+        }
+        setOk(true);
+        return;
+    }
+    public void spin(int wheel,int steps){
+        if (wheel >= currentIndex){
+            setOk(false);
+            return;
+        }
+        if (wheels.get(wheel-1).isLocked()){
+            setOk(false);
+            return;
+        }
+        if (currentIndex ==0 || configuration.size() < 2){
+            setOk(false);
+            return;
+        }
+        if (1<= wheel && wheel <= currentIndex){
+            Wheel w  = wheels.get(wheel-1);
+            Symbol obtained = w.spinSteps(steps);
+            sequence.set(wheel-1, obtained);
+        }
+
     }
     
-    public void deleteWheel(int pos){
-        if (wheels.get(pos-1) == null){
+    public String[] symbols(){
+        String[] symbols = configuration.values().toArray(new String[0]);
+        return symbols;
+    }
+    
+    public int distinctSymbols(){
+        return configuration.values().size();
+    }
+    public String[] configuration(){
+        ArrayList<String> temp = new ArrayList<>();
+        for (int i = 0; i < currentIndex; i++){
+            if (sequence.get(i) == null){
+                break;
+            }
+            temp.add(sequence.get(i).getColor());
+            
+        }
+        System.out.println("Configuration: "+ temp);
+        return temp.toArray(new String[0]);
+        
+        
+    }
+    public void delWheel(int pos){
+
+        if (wheels.get(pos-1) == null ){
+            setOk(false);
+            return;
+        }
+        
+        if (wheels.get(pos-1).isLocked()){
             setOk(false);
             return;
         }
@@ -125,6 +183,7 @@ public class SlotMachine {
         wheels.get(pos-1).makeInvisible();
         wheels.get(pos-1).clear();
         wheels.set(pos-1,null);
+        sequence.set(pos-1, null);
         for (int i = pos; i < currentIndex;i++ ){
             temp = wheels.get(i);
             wheels.set(i, null);
@@ -146,11 +205,12 @@ public class SlotMachine {
 
 
     }
-    public void moveSpinner(int distance){
+    private void moveSpinner(int distance){
         buttom.moveHorizontal(distance);
         line1.moveHorizontal(distance);
         line2.moveHorizontal(distance);
     }
+    
     private void reshape(){
         int length = wheels.size();
         int currentWidth = 40 * currentIndex;
@@ -173,20 +233,101 @@ public class SlotMachine {
 
     }
     
+    public void lock(int wheel){
+        if (wheel >= currentIndex){
+            setOk(false);
+            return;
+        }
+        if ( wheel < 1 || wheel > MAX_SIZE){
+            setOk(false);
+            return;
+        }
+        
+        if (wheels.get(wheel-1) != null){
+            wheels.get(wheel-1).setLock(true);
+            setOk(true);
+        }
+        setOk(false);
+    }
     
+    public void unlock(int wheel){
+        if (wheel >= currentIndex){
+            setOk(false);
+            return;
+        }
+        if ( wheel < 1 || wheel > MAX_SIZE){
+            setOk(false);
+            return;
+        }
+        if (wheels.get(wheel-1) != null && wheels.get(wheel-1).isLocked()){
+            wheels.get(wheel-1).setLock(false);
+            setOk(true);
+        }
+        setOk(false);
+    }
+    
+    
+    public void swap(int wheel1, int wheel2){
+        if ( wheel1 < 1 || wheel1 > MAX_SIZE || wheel2 < 1 || wheel2 > MAX_SIZE){
+            setOk(false);
+            return;
+        }
+
+        if (wheels.get(wheel1-1) == null || wheels.get(wheel2-1) == null){
+            setOk(false);
+            return;
+        }
+        if (wheels.get(wheel1-1).isLocked() || wheels.get(wheel2-1).isLocked()){
+            setOk(false);
+            return;
+        }
+        if (wheels.get(wheel1-1).isLocked() || wheels.get(wheel2-1).isLocked()){
+            setOk(false);
+            return;
+        }
+        Wheel w1 = wheels.get(wheel1-1);
+        Wheel w2= wheels.get(wheel2-1);
+        int[] p2  = w2.getPosition();
+        int[] p1 = w1.getPosition();
+        int distance = p2[0]-p1[0];
+        w1.moveHorizontal(distance);
+        w1.adjustSymbols(distance);
+        w2.moveHorizontal(-distance);
+        w2.adjustSymbols(-distance);
+        wheels.set(wheel1-1, w2);
+        wheels.set(wheel2-1,w1);
+        
+        if (configuration.size() >= 1){
+            sequence.set(wheel1-1, w2.getShapeCurrentPos());
+            sequence.set(wheel2-1,w1.getShapeCurrentPos());
+        }
+        makeVisible();
+    }
     public void spin(){
+        
         if (currentIndex ==0 ||configuration.size() < 2){
             setOk(false);
             return;
         }
         for (int i = 0; i < currentIndex; i++){
             Wheel w = wheels.get(i);
-            Symbol obtained = w.spin();
-            sequence.set(i,obtained);
+            if (!w.isLocked()){
+                Symbol obtained = w.spin();
+                sequence.set(i,obtained);
+            }
+
         }
     }
     
     public void spin(int pos){
+        if (pos >= currentIndex){
+            setOk(false);
+            return;
+        }
+        if (wheels.get(pos-1).isLocked()){
+            setOk(false);
+            return;
+        }
         if (currentIndex ==0 || configuration.size() < 2){
             setOk(false);
             return;
@@ -195,21 +336,6 @@ public class SlotMachine {
             Wheel w  = wheels.get(pos-1);
             Symbol obtained = w.spin();
             sequence.set(pos-1, obtained);
-        }
-    }
-    
-    public void spin(int pos1, int pos2){
-        if (currentIndex ==0 || configuration.size() < 2){
-            setOk(false);
-            return;
-        }
-        if (1 <= pos1  && pos1 <= currentIndex && 1<= pos2 && pos2 <= currentIndex){
-            Wheel w1 = wheels.get(pos1-1);
-            Symbol obtained1  = w1.spin();
-            sequence.set(pos1-1,obtained1);
-            Wheel w2 = wheels.get(pos2-1);
-            Symbol obtained2 = w2.spin();
-            sequence.set(pos2-1,obtained2);
         }
     }
     
@@ -253,6 +379,10 @@ public class SlotMachine {
         setOk(true);
     }
     public boolean isJackpot(){
+        if (configuration.size()<1){
+            setOk(false);
+            return false;
+        }
         if (wheels.get(0) == null){
             return false;
         }
@@ -264,7 +394,7 @@ public class SlotMachine {
         }
         return true;
     }
-    public void setOk(boolean state){
+    private void setOk(boolean state){
         ok = state; 
     }
 }

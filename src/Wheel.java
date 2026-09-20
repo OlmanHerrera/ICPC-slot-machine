@@ -18,8 +18,8 @@ public class Wheel extends Rectangle
     private boolean placed;
     private boolean ok; 
     private Random random = new Random();
-    private int currentPos;
-    
+    private int currentPos = -1;
+    private boolean locked = false;
     private Symbol currentSymbol;
     public Wheel()
     {
@@ -33,7 +33,6 @@ public class Wheel extends Rectangle
         
         if (!placed || symbolShape(color)  == null){
             setOk(false);
-            System.out.println("pendejo");
             return;
         }
         currentPos = pos-1;
@@ -63,32 +62,85 @@ public class Wheel extends Rectangle
         setOk(false);
     }
     
-    public Symbol spin(){
-
-        int numPos = random.nextInt(10,21);
-        int pos = 0; 
-        for (int i = 0; i <= numPos; i++){
+    
+    public Symbol spinSteps(int steps){
+        if (currentPos == -1){
+            setOk(false);
+            return null;
+        }
+        Symbol s = symbols.get(currentPos);
+        s.makeInvisible();
+        int pos = currentPos; 
+        for (int i = 0; i < steps; i++){
             pos++;
             if (pos == MAX_SIZE){
                 pos -= MAX_SIZE;
             }
-            Symbol s = symbols.get(pos);
-            if (s != null){
-                currentPos = pos;
-                symbols.get(currentPos).makeVisible();
-                try{
-                    Thread.sleep(50);
-                }catch (InterruptedException e){
-                    Thread.currentThread().interrupt();
+            s = symbols.get(pos);
+            while (s == null){
+                pos++;
+                if (pos == MAX_SIZE){
+                    pos -= MAX_SIZE;
                 }
-
+                s = symbols.get(pos);
             }
+            currentPos = pos;
+            symbols.get(currentPos).makeVisible();
+            try{
+                Thread.sleep(500);
+            }catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
+            } 
             symbols.get(currentPos).makeInvisible();
-                           
         }
         symbols.get(currentPos).makeVisible();
         return symbols.get(currentPos);
+    }
+    public Symbol spin(){
+        if (currentPos == -1){
+            setOk(false);
+            return null;
+        }
+        Symbol s = symbols.get(currentPos);
+        s.makeInvisible();
+        int numPos = random.nextInt(10,21);
+        int pos = currentPos; 
+        for (int i = 0; i < numPos; i++){
+            
+            pos++;
+            if (pos == MAX_SIZE){
+                pos -= MAX_SIZE;
+            }
+            s = symbols.get(pos);
+            while (s == null){
+                pos++;
+                if (pos == MAX_SIZE){
+                    pos -= MAX_SIZE;
+                }
+                s = symbols.get(pos);
+            }
+            currentPos = pos;
+            symbols.get(currentPos).makeVisible();
+            try{
+                Thread.sleep(250);
+            }catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
+            } 
+            symbols.get(currentPos).makeInvisible();
+        }
+        symbols.get(currentPos).makeVisible();
+        return symbols.get(currentPos);
+
         
+    }
+    public void adjustSymbols(int distance){
+        int[] position = this.getPosition();
+        for (Symbol s : symbols){
+            if (s != null){
+                s.makeInvisible();
+                s.moveHorizontal(distance);
+            }
+        }
     }
     
     public void moveSymbolsleft(){
@@ -116,6 +168,15 @@ public class Wheel extends Rectangle
         if ( 1 <= pos && pos <= MAX_SIZE){
             symbols.get(pos-1).makeInvisible();
             symbols.set(pos-1, null);
+            if (currentPos == pos-1){
+                for (int i = 0; i < MAX_SIZE; i++){
+                    if (symbols.get(i) != null){
+                        currentPos = i;
+                        break;
+                    }
+                }
+                
+            }
             setOk(true);
         }
         setOk(false);
@@ -152,6 +213,14 @@ public class Wheel extends Rectangle
             }
         }
     
+    }
+    
+    public void setLock(boolean state){
+        locked = state;
+    }
+    
+    public boolean isLocked(){
+        return locked;
     }
     
     public void setPlaced(boolean moved){
