@@ -187,9 +187,7 @@ public class SlotMachine {
             }
 
         }
-        if (seen.size() == 1){
-            return 0;
-        }
+
         return seen.size();
     }
     public String[] configuration(){
