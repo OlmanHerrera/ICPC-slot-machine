@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Write a description of class SlotMachine here.
@@ -11,7 +12,7 @@ import java.util.HashMap;
  * @version (a version number or a date)
  */
 public class SlotMachine {
-    private static int MAX_SIZE = 10;
+    private static int MAX_SIZE = 6;
     private List<Wheel> wheels = Arrays.asList(new Wheel[MAX_SIZE]);
     private List<Symbol> sequence = Arrays.asList(new Symbol[MAX_SIZE]);
     private Rectangle shape = new Rectangle();
@@ -26,10 +27,35 @@ public class SlotMachine {
     private Rectangle line1 = new Rectangle();
     private Rectangle line2 = new Rectangle();
     private Circle buttom = new Circle();
-
+    private Random random = new Random();
+    private String[] colours = {"red", "yellow", "blue", "green", "magenta", "black"};
     
     public SlotMachine(){
         updateShape();
+    }
+    
+    public SlotMachine(int n){
+        if (n < 1 || n > MAX_SIZE){
+            setOk(false);
+            return;
+        }
+        updateShape();
+        for (int i = 0; i <= n; i++){
+            addWheel(i);
+        }
+        int idx;
+        for (int pos = 1; pos <= n; pos++){
+            idx = random.nextInt(colours.length);
+            String color = colours[idx];
+            addSymbol(pos,color);
+            while( new HashSet<>(configuration.values()).size() != pos){
+                idx = random.nextInt(colours.length);
+                color = colours[idx];
+                addSymbol(pos,color);
+            }
+ 
+        }
+        makeVisible();
     }
     
     
@@ -71,8 +97,6 @@ public class SlotMachine {
             sequence.set(i, w.getShapeCurrentPos());
 
         }
-        makeVisible();
-
 
     }
     
@@ -150,7 +174,7 @@ public class SlotMachine {
     }
     
     public int distinctSymbols(){
-        return configuration.values().size();
+        return 0;
     }
     public String[] configuration(){
         ArrayList<String> temp = new ArrayList<>();
@@ -229,7 +253,6 @@ public class SlotMachine {
                 w.setPlaced(true);
             }
         }
-        makeVisible();
 
     }
     
@@ -320,7 +343,7 @@ public class SlotMachine {
     }
     
     public void spin(int pos){
-        if (pos >= currentIndex){
+        if (pos > currentIndex){
             setOk(false);
             return;
         }

@@ -13,7 +13,7 @@ import java.lang.Thread;
  */
 public class Wheel extends Rectangle
 {
-    private int MAX_SIZE = 3;
+    private int MAX_SIZE = 6;
     private List<Symbol> symbols = Arrays.asList(new Symbol[MAX_SIZE]);
     private boolean placed;
     private boolean ok; 
@@ -44,7 +44,7 @@ public class Wheel extends Rectangle
             }
             currentSymbol = s;
 
-            if (color == "red"){
+            if (color == "red" || color == "green" || color == "yellow"){
                 symbols.set(pos-1,s);
                 s.updateSize();
                 s.moveHorizontal(position[0]-20);
@@ -187,17 +187,20 @@ public class Wheel extends Rectangle
     }
     
     private Symbol symbolShape(String color){
-        if (color == "red"){
+        if (color == "red" || color == "green" || color == "yellow"){
             Rectangle shape = new Rectangle();
+            shape.changeColor(color);
             return shape;
         }
         
-        if (color == "green"){
+        if (color == "blue" || color == "magenta"){
             Circle shape = new Circle();
+            shape.changeColor(color);
             return shape;
         }
-        if (color == "yellow"){
+        if (color == "black"){
             Triangle shape = new Triangle();
+            shape.changeColor(color);
             return shape;
         }
         
