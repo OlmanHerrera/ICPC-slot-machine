@@ -148,7 +148,7 @@ public class SlotMachine {
         return;
     }
     public void spin(int wheel,int steps){
-        if (wheel >= currentIndex){
+        if (wheel > currentIndex){
             setOk(false);
             return;
         }
@@ -174,7 +174,23 @@ public class SlotMachine {
     }
     
     public int distinctSymbols(){
-        return 0;
+        if (configuration.size()<1){
+            setOk(false);
+            return -1;
+            
+        }
+        ArrayList<String> seen = new ArrayList<>();
+        for (int i = 0; i < currentIndex; i++){
+            
+            if (!seen.contains(sequence.get(i).getColor())){
+                seen.add(sequence.get(i).getColor());
+            }
+
+        }
+        if (seen.size() == 1){
+            return 0;
+        }
+        return seen.size();
     }
     public String[] configuration(){
         ArrayList<String> temp = new ArrayList<>();
