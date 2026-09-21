@@ -1,0 +1,12 @@
+#BlueJ class context
+#Sun Sep 20 21:48:35 EST 2026
+comment0.target=SlotMachineTest
+comment0.text=\r\n Write a description of class testSlotMachine here.\r\n \r\n @author (your name) \r\n @version (a version number or a date)\r\n
+comment1.target=void setUp()
+comment2.target=void shouldValidtestconstructorSlotmachine()
+comment3.target=void shouldValidtestverificarsimbolosdistintos()
+comment4.target=void shouldValidtestmetodospin()
+comment5.target=void shouldValidtestsimbolosdistintosspin()
+comment6.target=void shouldValidtestcombinacionspinysimbolosdistintos()
+comment7.target=void shouldValidtestlockrueda()
+numComments=8
