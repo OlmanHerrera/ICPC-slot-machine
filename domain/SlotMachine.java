@@ -1,3 +1,5 @@
+package domain;
+import shapes.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ import java.util.HashSet;
  * @version (a version number or a date)
  */
 public class SlotMachine {
-    private static int MAX_SIZE = 6;
+    private static int MAX_SIZE = 50;
     private List<Wheel> wheels = Arrays.asList(new Wheel[MAX_SIZE]);
     private List<Symbol> sequence = Arrays.asList(new Symbol[MAX_SIZE]);
     private Rectangle shape = new Rectangle();
@@ -58,7 +60,6 @@ public class SlotMachine {
         makeVisible();
     }
     
-    
     private void updateShape(){
         shape.changeSize(200,20);
         shape.moveVertical(-40);
@@ -76,12 +77,13 @@ public class SlotMachine {
         line2.changeSize(2,40);
         line2.changeColor("black");
         buttom.changeSize(20);
-        buttom.changeColor("red");
-        line1.moveVertical(-40);
+        buttom.changeColor("black");
+        line1.moveVertical(-30);
+        line2.moveVertical(8);
         line1.moveHorizontal(58);
         line2.moveHorizontal(20);
         buttom.moveHorizontal(70);
-        buttom.moveVertical(-50);
+        buttom.moveVertical(-40);
 
 
     }
@@ -93,13 +95,25 @@ public class SlotMachine {
         configuration.put(pos,color);
         for (int i = 0; i <currentIndex; i++){
             Wheel w = wheels.get(i);
-            w.addSymbol(pos, color);
+            w.addSymbol(pos, color, "normal");
             sequence.set(i, w.getShapeCurrentPos());
-
         }
-
+        makeVisible();
     }
     
+    public void addSymbol(String type, int pos, String color){
+        if (wheels.get(0) == null){
+            setOk(false);
+            return;
+        }
+        configuration.put(pos,color);
+        for (int i = 0; i <currentIndex; i++){
+            Wheel w = wheels.get(i);
+            w.addSymbol(pos, color, type);
+            sequence.set(i, w.getShapeCurrentPos());
+        }
+        makeVisible();
+    }
     public void delSymbol(int pos){
         for (int i = 0; i < currentIndex; i++){
             Wheel w = wheels.get(i);
@@ -129,6 +143,41 @@ public class SlotMachine {
             currentIndex++;
             wheels.set(pos-1, new Wheel());
             Wheel w = wheels.get(pos-1);
+            reshape();
+            setOk(true);
+            return; 
+        }
+        setOk(false);
+    }
+    
+    public void addWheel(String type, int pos){
+        Wheel newWheel =null;
+        if (type.equals("Lefty")){
+            newWheel = new Lefty(this, pos);
+        }
+        else if (type.equals("Rebel")){
+            newWheel = new Rebel();
+        }
+        else{
+            newWheel = new Wheel();
+        }
+        
+        if (pos < 1 || wheels.get(pos-1) != null){
+            setOk(false);
+            return;
+        
+        }
+        
+        if (pos >= 2){
+            if (wheels.get(pos-2) == null){
+                setOk(false);
+                return;
+            }
+        }
+
+        if (1<= pos && pos <= wheels.size()){
+            currentIndex++;
+            wheels.set(pos-1, newWheel);
             reshape();
             setOk(true);
             return; 
@@ -267,6 +316,7 @@ public class SlotMachine {
                 w.setPlaced(true);
             }
         }
+        makeVisible();
 
     }
     
@@ -431,6 +481,17 @@ public class SlotMachine {
         }
         return true;
     }
+    public Symbol getCurrentConfiguration(int wheel){
+        Symbol color = null;
+        try{
+            color = sequence.get(wheel-1);
+        }
+        catch (Exception e){
+            
+        }
+        return color;
+    }
+
     private void setOk(boolean state){
         ok = state; 
     }

@@ -1,4 +1,6 @@
-
+package domain;
+import shapes.*;
+ 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -14,7 +16,7 @@ import java.lang.Thread;
 public class Wheel extends Rectangle
 {
     private int MAX_SIZE = 6;
-    private List<Symbol> symbols = Arrays.asList(new Symbol[MAX_SIZE]);
+    protected List<Symbol> symbols = Arrays.asList(new Symbol[MAX_SIZE]);
     private boolean placed;
     private boolean ok; 
     private Random random = new Random();
@@ -25,37 +27,42 @@ public class Wheel extends Rectangle
     {
         this.changeColor("white");
         placed = false;
+        changeSize(80,40);
     
     }
     
-    
-    public void addSymbol(int pos, String color){
+    public void addSymbol(int pos, String color, String type){
         
-        if (!placed || symbolShape(color)  == null){
+        if (!placed || symbolShape(color, type )  == null){
             setOk(false);
             return;
         }
         currentPos = pos-1;
-        int[] position = this.getPosition();
+        int[] position = getPosition();
         if (1<=pos && pos <= MAX_SIZE){
-            Symbol s = symbolShape(color);
+            Symbol s = symbolShape(color,type);
             if (currentSymbol != null){
                 currentSymbol.makeInvisible();
             }
             currentSymbol = s;
 
-            if (color == "red" || color == "green" || color == "yellow"){
+            if (s.getShape()instanceof Rectangle){
                 symbols.set(pos-1,s);
-                s.updateSize();
                 s.moveHorizontal(position[0]-20);
                 s.moveVertical(30);
 
                 setOk(true);
                 return;
             }
-            s.moveHorizontal(position[0]);
-            s.moveVertical(30);
+            else if (s.getShape() instanceof Circle){
+                s.moveHorizontal(position[0]);
+                s.moveVertical(30);
+            }else{
+                s.moveHorizontal(position[0]);
+                s.moveVertical(30);
  
+            }
+
             symbols.set(pos-1, s);
             setOk(true);
         }
@@ -128,7 +135,7 @@ public class Wheel extends Rectangle
             } 
             symbols.get(currentPos).makeInvisible();
         }
-        symbols.get(currentPos).makeVisible();
+        symbols.get(currentPos).selectedMode();
         return symbols.get(currentPos);
 
         
@@ -186,27 +193,27 @@ public class Wheel extends Rectangle
         ok = state;
     }
     
-    private Symbol symbolShape(String color){
-        if (color == "red" || color == "green" || color == "yellow"){
-            Rectangle shape = new Rectangle();
-            shape.changeColor(color);
-            return shape;
-        }
+    private Symbol symbolShape(String color, String type){
+        Symbol shape = null;
+        Figure[] shapes = new Figure[3];
+        shapes[0] = new Rectangle();
+        shapes[1] = new Circle();
+        shapes[2] = new Triangle(); 
+        Random random  = new Random();
         
-        if (color == "blue" || color == "magenta"){
-            Circle shape = new Circle();
+        if (type.toLowerCase().equals("shy")){
+            shape = new Shy(shapes[random.nextInt(3)]);
             shape.changeColor(color);
-            return shape;
         }
-        if (color == "black"){
-            Triangle shape = new Triangle();
+        else if (type.toLowerCase().equals("ephemeral")){
+            shape = new Ephemeral(shapes[random.nextInt(3)]);
             shape.changeColor(color);
-            return shape;
         }
-        
         else{
-            return null;
+            shape = new Symbol(shapes[random.nextInt(3)]);
+            shape.changeColor(color);
         }
+        return shape;
     }
     
     public void makeSymbolsVisible(){

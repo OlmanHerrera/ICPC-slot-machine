@@ -1,2 +1,6 @@
 domain/*.ctxt
 domain/*.class
+shapes/*.ctxt
+shapes/*.class
+presentation/*.ctxt
+presentation/*.class

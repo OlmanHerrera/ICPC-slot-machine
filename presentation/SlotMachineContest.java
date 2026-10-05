@@ -1,4 +1,7 @@
+package presentation;
 
+ 
+import domain.*;
 /**
  * Write a description of class SlotMachineContest here.
  * 
