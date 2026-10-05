@@ -4,3 +4,5 @@ shapes/*.ctxt
 shapes/*.class
 presentation/*.ctxt
 presentation/*.class
+test/*.ctxt
+test/*.class
